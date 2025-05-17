@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Night Sky Poetry</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: radial-gradient(circle, #1a237e, #000000); /* Night sky gradient */
+      font-family: 'Times New Roman', serif;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    .poetry {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      text-align: center;
+      font-size: 24px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+      white-space: pre-wrap;
+      display: none; /* Hidden initially */
+    }
+
+    .opening {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    }
+
+    .start-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      color: white;
+      background-color: #3f51b5;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .start-button:hover {
+      background-color: #5c6bc0;
+    }
+
+    .character {
+      width: 150px;
+      height: auto;
+      margin-top: 20px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .closing {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      display: none; /* Hidden initially */
+      animation: fadeInOut 10s forwards;
+    }
+
+    @keyframes fadeInOut {
+      0% {
+        opacity: 0;
+      }
+      20% {
+        opacity: 1;
+      }
+      80% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .glitch {
+      font-size: 48px;
+      color: white;
+      position: relative;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+      animation: glitch 1s infinite;
+    }
+
+    .glitch::before,
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: white;
+      background: black;
+      overflow: hidden;
+      clip: rect(0, 900px, 0, 0);
+    }
+
+    .glitch::before {
+      animation: glitchTop 1s infinite;
+    }
+
+    .glitch::after {
+      animation: glitchBottom 1s infinite;
+    }
+
+    @keyframes glitch {
+      0% {
+        transform: translate(0);
+      }
+      20% {
+        transform: translate(-2px, 2px);
+      }
+      40% {
+        transform: translate(2px, -2px);
+      }
+      60% {
+        transform: translate(-2px, -2px);
+      }
+      80% {
+        transform: translate(2px, 2px);
+      }
+      100% {
+        transform: translate(0);
+      }
+    }
+
+    @keyframes glitchTop {
+      0% {
+        clip: rect(0, 900px, 0, 0);
+      }
+      50% {
+        clip: rect(10px, 900px, 50px, 0);
+      }
+      100% {
+        clip: rect(0, 900px, 0, 0);
+      }
+    }
+
+    @keyframes glitchBottom {
+      0% {
+        clip: rect(0, 900px, 0, 0);
+      }
+      50% {
+        clip: rect(60px, 900px, 100px, 0);
+      }
+      100% {
+        clip: rect(0, 900px, 0, 0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="opening" id="opening">
+    I HAVE SOMETHING FOR YOU!!!
+    <br>
+    <img src="https://media.tenor.com/images/942b376ccbd9e346ba3bd5175a6ed7d3/tenor.gif" alt="Cute Cartoon Hugging" class="character">
+    <br>
+    <button class="start-button" id="startButton">Click Here Baby</button>
+  </div>
+  <div class="poetry" id="poetry"></div>
+  <div class="closing" id="closing">
+    <h1 class="glitch" data-text="ERROR">ERROR</h1>
+    <p class="glitch" data-text="Something went wrong...">Something went wrong...</p>
+  </div>
+  <canvas id="nightSkyCanvas"></canvas>
+  <audio id="errorSound" src="c:/Users/ASUS/Downloads/machine-error-by-prettysleepy-art-12669.mp3"></audio>
+  <script>
+    const canvas = document.getElementById('nightSkyCanvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const stars = [];
+    const starCount = 100;
+
+    // Create star objects
+    for (let i = 0; i < starCount; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 2 + 1,
+        speed: Math.random() * 0.5 + 0.2,
+        opacity: Math.random() * 0.5 + 0.5, // Initial opacity
+        flickerSpeed: Math.random() * 0.02 + 0.01 // Speed of flickering
+      });
+    }
+
+    function drawStar(star) {
+      ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+      ctx.beginPath();
+      ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawMoon() {
+      const moonX = canvas.width - 150;
+      const moonY = 150;
+      const moonRadius = 80;
+
+      // Draw the moon
+      ctx.fillStyle = 'rgba(255, 255, 200, 0.9)';
+      ctx.beginPath();
+      ctx.arc(moonX, moonY, moonRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Create a shadow for the crescent effect
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.beginPath();
+      ctx.arc(moonX - 20, moonY - 10, moonRadius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw the moon
+      drawMoon();
+
+      // Draw and animate stars
+      stars.forEach(star => {
+        drawStar(star);
+
+        // Flicker effect
+        star.opacity += star.flickerSpeed;
+        if (star.opacity >= 1 || star.opacity <= 0.5) {
+          star.flickerSpeed *= -1; // Reverse flicker direction
+        }
+
+        // Move stars
+        star.y += star.speed;
+        if (star.y > canvas.height) {
+          star.y = -star.radius;
+          star.x = Math.random() * canvas.width;
+        }
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    // Start animation when the button is clicked
+    document.getElementById('startButton').addEventListener('click', () => {
+      document.getElementById('opening').style.display = 'none'; // Hide opening
+      document.getElementById('poetry').style.display = 'block'; // Show poetry
+      animate();
+      typePoetry();
+    });
+
+    // Show closing animation after poetry finishes
+    function showClosing() {
+      document.getElementById('poetry').style.display = 'none'; // Hide poetry
+      document.getElementById('closing').style.display = 'block'; // Show closing
+
+      const errorSound = document.getElementById("errorSound"); // Ambil elemen audio
+      errorSound.volume = 0.5; // Atur volume ke 50%
+      errorSound.currentTime = 0; // Reset waktu audio ke awal
+      errorSound.play(); // Putar suara error
+    }
+
+    // Typing effect for poetry
+    const poetryElement = document.getElementById('poetry');
+    const poetryText = `You are the ache I would choose a thousand times
+The weight of joy I'll carry forever
+You are the story I've been waiting to write
+but never knew how to end.`;
+
+    let index = 0;
+    const typingSound = new Audio("c:/Users/ASUS/Downloads/tiktok.mp3.mp3"); // Buat elemen audio sekali
+    typingSound.volume = 1; // Atur volume ke 100%
+
+    typingSound.addEventListener('error', (e) => {
+      console.error('Error playing audio:', e);
+    });
+
+    function typePoetry() {
+      if (index < poetryText.length) {
+        poetryElement.textContent += poetryText[index];
+        index++;
+        typingSound.currentTime = 0; // Reset waktu audio ke awal
+        typingSound.play(); // Putar suara ketikan
+        setTimeout(typePoetry, 100); // Sesuaikan kecepatan dengan suara
+      } else {
+        setTimeout(showClosing, 27000); // Show closing after 27 seconds
+      }
+    }
+  </script>
+</body>
+</html>
